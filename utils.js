@@ -4,8 +4,18 @@ let maxX = 0
 /**
  * Draws a circle based on a certain divisions and will draw lines between the division points
  */
-function drawCircle (x, y, r, divisions, config) {
-    const { angle = 0, clr = '#fff', filled = true, stroked = false, strokeWeight = 1} = config
+function drawCircle (x, y, r, config) {
+    const {
+        divisions = 100,
+        angle = 0,
+        color = '#fff',
+        filled = true,
+        stroked = false,
+        strokeWeight = 1,
+        alphaRnd = [0, 1],
+        weightRnd = 5,
+        probability = 0.5
+    } = config
 
     let theta = TWO_PI / divisions
     const points = []
@@ -51,10 +61,10 @@ function drawCircle (x, y, r, divisions, config) {
                 y1: p1.y,
                 x2: p2.x,
                 y2: p2.y,
-                color: clr,
-                alphaRnd: [0.5, 1],
-                weightRnd: 5,
-                probability: 0.6
+                color,
+                alphaRnd,
+                weightRnd,
+                probability
             })
         }
     }
@@ -70,10 +80,10 @@ function drawCircle (x, y, r, divisions, config) {
                 y1: p1.y,
                 x2: p2.x,
                 y2: p2.y,
-                color: clr,
-                alphaRnd: [0.5, 1],
-                weightRnd: 5,
-                probability: 1
+                color,
+                alphaRnd,
+                weightRnd,
+                probability
             })
         }
     }

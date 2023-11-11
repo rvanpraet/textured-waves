@@ -10,14 +10,18 @@ function setup() {
     createCanvas(2560, 2560, WEBGL);
     background(palette.bg)
 
-    drawCircle(0, 0, width * 0.15, 300, {
+    drawCircle(0, 0, width * 0.15, {
+        divisions: 200,
         angle: 0,
-        filled: true,
+        filled: false,
         stroked: true,
-        strokeWeight: width * 0.2
+        strokeWeight: width * 0.15,
+        alphaRnd: [0.1, 0.5],
+        weightRnd: 7
     })
 
-    drawCircle(0, 0, width * 0.35, 600, {
+    drawCircle(0, 0, width * 0.35, {
+        divisions: 600,
         angle: 0,
         filled: false,
         stroked: true,
