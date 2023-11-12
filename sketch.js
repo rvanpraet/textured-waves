@@ -1,87 +1,62 @@
 let rows
 let cols
 let palette
-const TOTAL_FRAMES = 1000
+let rowPos = 0
+let step
+const TOTAL_FRAMES = 10
 
 function setup() {
-    palette = palette1 // Pick palette
-    frameRate(24)
+    palette = palette5 // Pick palette
+    // frameRate(24)
     // Setup canvas // 3840 x 2160 for hi-res
+    // createCanvas(720, 1280, WEBGL);
     createCanvas(2560, 2560, WEBGL);
+
+    blendMode(ADD)
+    step = floor(width * 0.04) // Step influences how thick the rows are, as well as the gap between the rows
+
     background(palette.bg)
-
-    drawCircle(0, 0, width * 0.15, {
-        divisions: 200,
-        angle: 0,
-        filled: false,
-        stroked: true,
-        strokeWeight: width * 0.15,
-        alphaRnd: [0.1, 0.5],
-        weightRnd: 7
-    })
-
-    drawCircle(0, 0, width * 0.35, {
-        divisions: 600,
-        angle: 0,
-        filled: false,
-        stroked: true,
-        strokeWeight: 100
-    })
-
-    drawLine({
-        x1: -width * 0.45,
-        y1: -height * 0.45,
-        x2: width * 0.45,
-        y2: -height * 0.45,
-        color: '#fff',
-        alphaRnd: [0.1, 0.5],
-        weightRnd: 15,
-        probability: 0.1
-    })
-
-    drawLine({
-        x1: -width * 0.45,
-        y1: height * 0.45,
-        x2: width * 0.45,
-        y2: height * 0.45,
-        color: '#fff',
-        alphaRnd: [0.1, 0.5],
-        weightRnd: 15,
-        probability: 0.1
-    })
-
-    drawLine({
-        x1: width * 0.45,
-        y1: -height * 0.45,
-        x2: width * 0.45,
-        y2: height * 0.45,
-        color: '#fff',
-        alphaRnd: [0.1, 0.5],
-        weightRnd: 15,
-        probability: 0.1
-    })
-
-    drawLine({
-        x1: -width * 0.45,
-        y1: -height * 0.45,
-        x2: -width * 0.45,
-        y2: height * 0.45,
-        color: '#fff',
-        alphaRnd: [0.1, 0.5],
-        weightRnd: 15,
-        probability: 0.1
-    })
+    drawWaves()
+    save('dunes.tiff')
 
     noLoop()
 }
 
 function draw() {
-    if (frameCount % 10 === 0) {
-        // console.log('Progress :::: ', floor(frameCount / TOTAL_FRAMES * 100), '%');
+
+
+    if (frameCount % 1 === 0) {
+        console.log('Progress :::: ', floor(frameCount / TOTAL_FRAMES * 100), '%');
     }
 
     if (frameCount === TOTAL_FRAMES) {
-        // noLoop()
+        noLoop()
         // save('airplane_flow.tiff')
+    }
+}
+
+function drawWaves () {
+    let color = sampleArray(palette.colors)
+    for (let y = -height * 0.6; y <= height * 0.6; y++) {
+        drawLine({
+            x1: floor(-width * 0.45),
+            y1: y,
+            x2: floor(width * 0.45),
+            y2: y,
+            color,
+            alphaRnd: [0.1, 0.3],
+            weightRnd: noise(y * 0.0035) * width * 0.004,
+            probability: 0.2,
+            shouldContrast: true
+        })
+
+
+        // When a step is finished, offset the y position with the newly calculated step
+        if (floor(y % step) === 0) {
+            color = sampleArray(palette.colors) // Change random color
+            step += chance(0.45) ? floor(width * 0.005) : -floor(width * 0.005)
+            rowPos++
+            y += step * 0.25
+        }
     }
 }

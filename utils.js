@@ -1,6 +1,5 @@
 let minX = 0
 let maxX = 0
-
 /**
  * Draws a circle based on a certain divisions and will draw lines between the division points
  */
@@ -20,11 +19,12 @@ function drawCircle (x, y, r, config) {
     let theta = TWO_PI / divisions
     const points = []
 
-    // push()
+    push()
     // translate(x, y)
     // rotate(PI/2 * noise(x * 0.005))
     // rotate(angle)
 
+    // Store points on the circle
     for (let i=0; i<divisions; i++) {
         const xCir = cos((theta) * i) * r
         const yCir = sin((theta) * i) * r
@@ -64,7 +64,8 @@ function drawCircle (x, y, r, config) {
                 color,
                 alphaRnd,
                 weightRnd,
-                probability
+                probability,
+                debug: true
             })
         }
     }
@@ -83,15 +84,12 @@ function drawCircle (x, y, r, config) {
                 color,
                 alphaRnd,
                 weightRnd,
-                probability
+                probability,
+                debug: true
             })
         }
     }
-    // pop()
-}
-
-function drawCircleStroked(x, y, r, divisions, strokeWeight) {
-
+    pop()
 }
 
 /**
@@ -99,7 +97,8 @@ function drawCircleStroked(x, y, r, divisions, strokeWeight) {
  *
  */
 function drawLine(props) {
-    let { x1, x2, y1, y2, color, alphaRnd, weightRnd, probability } = props;
+    let { x1, x2, y1, y2, color, alphaRnd, weightRnd, probability, shouldContrast = false, debug = false } = props;
+    let count = 0
 
     x1 = floor(x1);
     y1 = floor(y1);
@@ -115,17 +114,39 @@ function drawLine(props) {
         // probability = weightedProb
 
         if (chance(probability)) {
-            const clr = colorAlpha(color, random(alphaRnd))
+            if (shouldContrast && chance(0.000003)) {
+                const r = random(width * 0.2)
+                drawCircle(x, y, r, {
+                    divisions: 600,
+                    color: palette.contrast,
+                    filled: chance(0.5),
+                    stroked: true,
+                    strokeWeight: r * 0.5,
+                    alphaRnd: [0.01, 0.5],
+                    weightRnd: 4,
+                    probability: 0.5
+                })
+            }
+            // if (debug) {
+            //     console.log('debug ::: ', x, y)
+            // }
+
+            const noiseVal = noise(x * 0.003, y * 0.0045)
+            const d = abs(dist(x, y, 0, 0))
+            const maxD = abs(dist(-width * 0.5, -height * 0.5, 0, 0))
+
+            const sampledClrIdx = floor(map(d, 0, maxD, 0, palette.colors.length - 1))
+
+            const yOff = sin(count * 0.0025 + noiseVal * PI)  * 100
 
             push();
-
-            translate(x, y)
-
             noStroke()
-            fill(clr);
-            circle(0, 0, random(1, weightRnd))
+            fill(colorAlpha(color, random(alphaRnd)));
+            circle(x, y + yOff, random(1, weightRnd))
             pop();
         }
+
+        count++
     };
 
     // Line is not vertical
@@ -222,5 +243,5 @@ function sampleArrayNoise (x = null, y = null, array = []) {
     }
 
     const noiseIdx = ceil(noiseVal * array.length) - 1
-    return array[noise]
+    return array[noiseIdx]
 }

@@ -2,10 +2,10 @@ const palette1 = {
     bg: '#000',
     contrast: '#A5E6BA',
     colors: [
-        '#232C33', // Gunmetal black
+        '#7C8483', // Battleship grey
         '#F06543', // Orange soda
         '#FFC862', // Maximum Yellowred
-        '#7C8483' // Battleship grey
+        '#232C33', // Gunmetal black
     ]
 }
 const palette2 = {
@@ -27,6 +27,28 @@ const palette3 = {
         '#7CEA9C', // Light green
         '#EFDD8D', // Flax,
         // '#FC7A1E'
+    ]
+}
+
+const palette4 = {
+    bg: '#000', // Black
+    contrast: '#FC7A1E', // PUMPKIN
+    colors: [
+        '#6C3428',
+        '#BA704F',
+        '#DFA878',
+        '#CEE6F3',
+    ]
+}
+
+const palette5 = {
+    bg: '#000', // Black
+    contrast: '#FF6666',
+    colors: [
+        '#001524',
+        '#445D48',
+        '#D6CC99',
+        '#FDE5D4',
     ]
 }
 
