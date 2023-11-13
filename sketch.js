@@ -12,7 +12,7 @@ let gradientProb
 const TOTAL_FRAMES = 10
 
 function setup() {
-    palette = palette3 // Pick palette
+    palette = palette7 // Pick palette
     // frameRate(24)
     // Setup canvas // 3840 x 2160 for hi-res
     // createCanvas(720, 1280, WEBGL);
@@ -22,16 +22,24 @@ function setup() {
     blendMode(ADD)
     background(palette.bg)
 
+    // Setup starting colors
+    prevColor = sampleArray(palette.colors)
+    currentColor = sampleArray(palette.colors)
+    nextColor = sampleArray(palette.colors)
+
+    // Drawing setup
     step = floor(width * 0.3) // Step influences how thick the rows are, as well as the gap between the rows
     grainWeight = width * 0.002
 
     drawWaves()
+    drawRandomCircle(0, 0, width * 0.1, width * 0.35, width * 0.25,
+        { yOffset: 150, shouldContrast: true })
 
     // blendMode(OVERLAY)
 
-    // drawSquare()
+    drawSquare()
 
-    // save('dunes.tiff')
+    save('dunes.tiff')
 
     noLoop()
 }
@@ -50,10 +58,6 @@ function draw() {
 }
 
 function drawWaves () {
-    prevColor = sampleArray(palette.colors)
-    currentColor = sampleArray(palette.colors)
-    nextColor = sampleArray(palette.colors)
-
     let stepCounter = abs(step)
     let probability = 0.6
 
@@ -72,11 +76,12 @@ function drawWaves () {
             alphaRnd: [0.1, 0.275],
             weightRnd: noise(y * 0.0035) * grainWeight,
             probability: probability,
-            shouldContrast: false,
-            // yOffset: map ( noise(step * 0.015, y * 0.006), 0, 1, 80, 120 ),
-            yOffset: map( random(), 0, 1, 40, 120 ),
-            // noiseX: 0.003 + random(0.001, 0.004),
-            // noiseY: 0.0045 + random(0.001, 0.003)
+            yOffset: map ( noise(stepCounter * y * 0.015), 0, 1, 40, 120 ),
+            // yOffset: map( random(), 0, 1, 40, 120 ),
+            // yOffset: 100
+            noiseX: 0.003 + sin(stepCounter * 0.1) * 0.001,
+            noiseY: 0.0025 + cos(stepCounter * 0.2) * 0.0015,
+            randomCircles: true
         })
 
         // Calculate if y is near the edge of a previous row, and generate probability for color interchanges
@@ -100,26 +105,25 @@ function drawWaves () {
 }
 
 function drawSquare() {
-
     const props = {
         weight: 50,
         color: palette.contrast,
         alphaRnd: [0.05, 0.2],
         weightRnd: grainWeight,
         probability: 0.25,
-        shouldContrast: false,
-        yOffset: 75,
+        shouldContrast: true,
+        yOffset: 20,
     }
 
-    // for(let i = 0; i < 4; i++) {
-    //     drawLineStroked({
-    //         x1: random(-1, 1) * floor(width * 0.415),
-    //         y1: random(-1, 1) * floor(height * 0.4),
-    //         x2: random(-1, 1) * floor(width * 0.415),
-    //         y2: random(-1, 1) * floor(width * 0.4),
-    //         ...props
-    //     })
-    // }
+    for(let i = 0; i < 2; i++) {
+        drawLineStroked({
+            x1: random(-1, 1) * floor(width * 0.415),
+            y1: random(-1, 1) * floor(height * 0.4),
+            x2: random(-1, 1) * floor(width * 0.415),
+            y2: random(-1, 1) * floor(width * 0.4),
+            ...props
+        })
+    }
 
     // Corner
     // drawLineStroked({
@@ -131,20 +135,42 @@ function drawSquare() {
     //     y2: height * 0.12 + height * 0.075 * random(-1, 1),
     // })
 
-    // Parallel lines
-    const start_x = floor(-width * 0.415) + random(-1, 1) * floor(width * 0.05)
-    drawLineStroked({
-        x1: start_x,
-        y1: - height * 0.4 - random(height * 0.075),
-        x2: start_x,
-        y2: -height * 0.02 - random(height * 0.075),
-        ...props
-    })
-    drawLineStroked({
-        x1: start_x + width * 0.05,
-        y1: - height * 0.36 - random(height * 0.075),
-        x2: start_x + width * 0.05,
-        y2: height * 0.07 - random(height * 0.075),
-        ...props
+    // // Parallel lines
+    // const start_x = floor(-width * 0.415) + random(-1, 1) * floor(width * 0.05)
+    // drawLineStroked({
+    //     x1: start_x,
+    //     y1: - height * 0.4 - random(height * 0.075),
+    //     x2: start_x,
+    //     y2: -height * 0.02 - random(height * 0.075),
+    //     ...props
+    // })
+    // drawLineStroked({
+    //     x1: start_x + width * 0.05,
+    //     y1: - height * 0.36 - random(height * 0.075),
+    //     x2: start_x + width * 0.05,
+    //     y2: height * 0.07 - random(height * 0.075),
+    //     ...props
+    // })
+}
+
+function drawRandomCircle(x, y, minR, maxR, rThresh, config) {
+    const r = random(minR, maxR)
+    let prob = 0.5
+
+    if (r > rThresh) {
+        prob = map( r, rThresh, maxR, prob - 0.5, 0.05 )
+    }
+
+    drawCircle(x, y, r, {
+        divisions: 600,
+        color: palette.contrast,
+        filled: false,
+        stroked: true,
+        strokeWeight: r * random(0.05, 0.5),
+        alphaRnd: [0.1, 0.5],
+        weightRnd: grainWeight * .5,
+        probability: prob,
+        yOffset: 50,
+        ...config
     })
 }

@@ -13,21 +13,17 @@ function drawCircle (x, y, r, config) {
         strokeWeight = 1,
         alphaRnd = [0, 1],
         weightRnd = 5,
-        probability = 0.5
+        probability = 0.5,
+        shouldContrast
     } = config
 
     let theta = TWO_PI / divisions
     const points = []
 
-    push()
-    // translate(x, y)
-    // rotate(PI/2 * noise(x * 0.005))
-    // rotate(angle)
-
     // Store points on the circle
     for (let i=0; i<divisions; i++) {
-        const xCir = cos((theta) * i) * r
-        const yCir = sin((theta) * i) * r
+        const xCir = x + cos((theta) * i) * r
+        const yCir = y + sin((theta) * i) * r
 
         if (!minX || xCir < minX) minX = xCir
         if (!maxX || xCir > maxX) maxX = xCir
@@ -50,7 +46,7 @@ function drawCircle (x, y, r, config) {
             let dx = cos(a) * strokeWeight;
             let dy = sin(a) * strokeWeight;
 
-            // Update the position
+            // Update the position, moving towards the endpoint (x2, y2) for drawLine function
             v.add(createVector(dx, dy));
 
             const p2 = { x: v.x, y: v.y }
@@ -65,12 +61,14 @@ function drawCircle (x, y, r, config) {
                 alphaRnd,
                 weightRnd,
                 probability,
-                debug: true
+                debug: true,
+                shouldContrast
             })
         }
     }
 
     if (filled) {
+        console.log('drawing');
         for (let i=1; i <= points.length / 2; i++) {
             const p1 = points[i]
             const p2 = points[points.length - i - 1]
@@ -85,11 +83,10 @@ function drawCircle (x, y, r, config) {
                 alphaRnd,
                 weightRnd,
                 probability,
-                debug: true
+                shouldContrast
             })
         }
     }
-    pop()
 }
 
 /**
@@ -103,13 +100,13 @@ function drawLine(props) {
         alphaRnd,
         weightRnd,
         probability,
-        shouldContrast = false,
-        debug = false,
+        randomCircles = false,
         useNoise = true,
-        noiseX = 0.003,
-        noiseY = 0.0045,
+        noiseX = 0.0023,
+        noiseY = 0.0035,
         xOffset = 0,
-        yOffset = 100
+        yOffset = 100,
+        shouldContrast = false
     } = props;
     let count = 0
 
@@ -130,54 +127,39 @@ function drawLine(props) {
 
         if (chance(probability)) {
             // Chance of drawing a circle at a spot in the line
-            // TODO: BUGGY, CIRCLES GET DRAWN IN CENTER INSTEAD OF AT X,Y
-            if (shouldContrast && chance(0.000005)) {
-                const rThresh = width * 0.15
-                const maxR = width * 0.35
-                const r = random(maxR)
-                let prob = 0.35
-
-                if (r > rThresh) {
-                    prob = map( r, rThresh, maxR, 0.3, 0.05 )
-                }
-
-                drawCircle(x, y, r, {
-                    divisions: 1000,
-                    color: palette.contrast,
-                    filled: chance(0.5),
-                    stroked: true,
-                    strokeWeight: r * random(0.05, 0.5),
-                    alphaRnd: [0.01, 0.5],
-                    weightRnd: grainWeight * 0.33,
-                    probability: prob,
+            if (randomCircles && chance(0.000002)) {
+                drawRandomCircle(x, y, width * 0.01, width * 0.2, width * 0.1, {
                     noiseX: noiseX * 3,
                     noiseY: noiseY * 3,
-                    yOffset: 50
+                    shouldContrast: true
                 })
             }
-            // if (debug) {
-            //     console.log('debug ::: ', x, y)
-            // }
 
             const noiseVal =  noise(x * noiseX, y * noiseY)
-            const phaseYOffset = true ? (height * 0.5 - abs(y)) : y // Change true or fale for inverted y
+            const phaseYOffset = false ? (height * 0.5 - abs(y)) : y // Change true or fale for inverted y
 
             const phase = map(y + height * 0.5, 0, height, 0, 360)
-                + map(noiseVal * phaseYOffset, 0, height * 0.5, 0, 360)
+                + map(noiseVal * phaseYOffset, 0, height * 0.5, 0, 90) // Add this for noise-like terrain
 
             // const yOff = useNoise ? sin(count * 0.0025 + noiseVal * PI) * yOffset : 0 // With sine
             // const yOff = useNoise ? sin(count * 0.0025 + noiseVal * (height * 0.5 - abs(y)) * radians(phase)) * yOffset : 0 // With sine
             const yOff = useNoise ? sin(count * 0.0025 + radians(phase)) * yOffset : 0 // With sine
+
             // const yOff = useNoise ? map(noiseVal, 0, 1, -1, 1) * yOffset : 0 // Without sine
 
             let fillColor = currentColor
-            if (chance(abs(gradientProb))) {
+
+            if (shouldContrast) {
+                fillColor = color || palette.contrast
+            }
+
+            else if (chance(abs(gradientProb))) {
                 fillColor = gradientProb < 0 ? prevColor : nextColor
             }
 
             push();
             noStroke()
-            fill(colorAlpha(chance(gradientProb) ? nextColor : color, random(alphaRnd)));
+            fill(colorAlpha(fillColor, random(alphaRnd)));
             circle(x, y + yOff, random(1, weightRnd))
             pop();
         }

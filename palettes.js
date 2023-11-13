@@ -2,23 +2,23 @@ const palette1 = {
     bg: '#000',
     contrast: '#A5E6BA',
     colors: [
-        '#7C8483', // Battleship grey
-        '#F06543', // Orange soda
-        '#FFC862', // Maximum Yellowred
-        '#232C33', // Gunmetal black
+        '#7C8483',
+        '#F06543',
+        '#FFC862',
+        '#232C33',
     ]
 }
 const palette2 = {
-    bg: '#000', // Black
-    // contrast: '#D33F49', // Rusty Red
-    // contrast: '#EE6352', // Bittersweet
-    // contrast: '#A846A0', // Purpureus
-    contrast: '#81E5EF', // Purpureus
+    bg: '#000',
+    // contrast: '#D33F49',
+    // contrast: '#EE6352',
+    // contrast: '#A846A0',
+    contrast: '#81E5EF',
     colors: [
-        '#000022', // Oxford blue
-        '#8DA1B9', // Cadet grey
-        '#D1D0A3', // Sage
-        '#386150' // Hunter Green
+        '#000022',
+        '#8DA1B9',
+        '#D1D0A3',
+        '#386150'
     ]
 }
 const palette3 = {
@@ -35,7 +35,7 @@ const palette3 = {
 }
 
 const palette4 = {
-    bg: '#000', // Black
+    bg: '#120000', // Black
     // contrast: '#68A691', // Blueish
     // contrast: '#EAFDF8', // Azure white
     contrast: '#83B692', // Cambridge greenblue
@@ -56,6 +56,33 @@ const palette5 = {
         '#445D48',
         '#D6CC99',
         '#FDE5D4',
+    ]
+}
+
+
+const palette6 = {
+    bg: '#fffff2', // Black
+    // bg: '#000', // Black
+    contrast: '#994636',
+    // contrast: '#EAFDF8',
+    colors: [
+        '#CACAAA',
+        '#EEC584',
+        '#C8AB83',
+        '#55868C',
+    ]
+}
+
+const palette7 = {
+    bg: '#aaaaaa', // Black
+    // bg: '#000', // Black
+    contrast: '#D8F793',
+    // contrast: '#EAFDF8',
+    colors: [
+        '#5E0035',
+        '#498C8A',
+        '#120D31',
+        '#4D4730',
     ]
 }
 
