@@ -4,6 +4,11 @@ let palette
 let rowPos = 0
 let step
 let grainWeight
+let prevColor
+let currentColor
+let nextColor
+let gradientProb
+
 const TOTAL_FRAMES = 10
 
 function setup() {
@@ -17,7 +22,7 @@ function setup() {
     blendMode(ADD)
     background(palette.bg)
 
-    step = floor(width * 0.06) // Step influences how thick the rows are, as well as the gap between the rows
+    step = floor(width * 0.3) // Step influences how thick the rows are, as well as the gap between the rows
     grainWeight = width * 0.002
 
     drawWaves()
@@ -26,7 +31,7 @@ function setup() {
 
     // drawSquare()
 
-    save('dunes.tiff')
+    // save('dunes.tiff')
 
     noLoop()
 }
@@ -45,7 +50,11 @@ function draw() {
 }
 
 function drawWaves () {
-    let color = sampleArray(palette.colors)
+    prevColor = sampleArray(palette.colors)
+    currentColor = sampleArray(palette.colors)
+    nextColor = sampleArray(palette.colors)
+
+    let stepCounter = abs(step)
     let probability = 0.6
 
     for (let y = -height * 0.6; y <= height * 0.6; y++) {
@@ -59,7 +68,7 @@ function drawWaves () {
             y1: y + sin(rowPos) * width * 0.03,
             x2: floor(width * 0.415) + random() * width * 0.075,
             y2: y + cos(rowPos) * width * 0.03,
-            color,
+            color: currentColor,
             alphaRnd: [0.1, 0.275],
             weightRnd: noise(y * 0.0035) * grainWeight,
             probability: probability,
@@ -70,13 +79,22 @@ function drawWaves () {
             // noiseY: 0.0045 + random(0.001, 0.003)
         })
 
+        // Calculate if y is near the edge of a previous row, and generate probability for color interchanges
+        stepCounter--
+        gradientProb = map( stepCounter, step, 0, -0.75, 0.75)
 
-        // When a step is finished, offset the y position with the newly calculated step
-        if (floor(y % abs(step)) === 0) {
-            color = sampleArray(palette.colors) // Change random color
-            step += chance(0.475) ? floor(width * 0.005) : -floor(width * 0.005)
-            rowPos++
+        if (stepCounter === 0) {
+            // Shift colors
+            prevColor = currentColor
+            currentColor = nextColor
+            nextColor = sampleArray(palette.colors) // Change random color
+
+            // Increase or decrease step, reset step counter and shift y value forward, creating a gap
+            step += chance(0.38) ? floor(width * 0.065) : -floor(width * 0.065)
+            stepCounter = abs(step)
             y += floor(step * 0.1)
+
+            rowPos++
         }
     }
 }

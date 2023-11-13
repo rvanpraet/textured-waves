@@ -163,17 +163,21 @@ function drawLine(props) {
             const phaseYOffset = true ? (height * 0.5 - abs(y)) : y // Change true or fale for inverted y
 
             const phase = map(y + height * 0.5, 0, height, 0, 360)
-                // + map(noiseVal * phaseYOffset, 0, height * 0.5, 0, 360)
+                + map(noiseVal * phaseYOffset, 0, height * 0.5, 0, 360)
 
             // const yOff = useNoise ? sin(count * 0.0025 + noiseVal * PI) * yOffset : 0 // With sine
             // const yOff = useNoise ? sin(count * 0.0025 + noiseVal * (height * 0.5 - abs(y)) * radians(phase)) * yOffset : 0 // With sine
             const yOff = useNoise ? sin(count * 0.0025 + radians(phase)) * yOffset : 0 // With sine
             // const yOff = useNoise ? map(noiseVal, 0, 1, -1, 1) * yOffset : 0 // Without sine
 
+            let fillColor = currentColor
+            if (chance(abs(gradientProb))) {
+                fillColor = gradientProb < 0 ? prevColor : nextColor
+            }
 
             push();
             noStroke()
-            fill(colorAlpha(color, random(alphaRnd)));
+            fill(colorAlpha(chance(gradientProb) ? nextColor : color, random(alphaRnd)));
             circle(x, y + yOff, random(1, weightRnd))
             pop();
         }
