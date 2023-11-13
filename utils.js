@@ -97,7 +97,20 @@ function drawCircle (x, y, r, config) {
  *
  */
 function drawLine(props) {
-    let { x1, x2, y1, y2, color, alphaRnd, weightRnd, probability, shouldContrast = false, debug = false } = props;
+    let {
+        x1, x2, y1, y2,
+        color,
+        alphaRnd,
+        weightRnd,
+        probability,
+        shouldContrast = false,
+        debug = false,
+        useNoise = true,
+        noiseX = 0.003,
+        noiseY = 0.0045,
+        xOffset = 0,
+        yOffset = 100
+    } = props;
     let count = 0
 
     x1 = floor(x1);
@@ -107,37 +120,56 @@ function drawLine(props) {
 
     const drawFn = (x, y) => {
         // // Uncomment if you want to weigh the probability of drawing a point at x, y
-        // const maxD = dist(-width * 0.5, -height * 0.5, 0, 0)
-        // const weightedProb = prob * d / maxD // Linear weighted probability
+        const d = abs(dist(x, y, 0, 0))
+        const maxD = abs(dist(-width * 0.5, -height * 0.5, 0, 0))
+        const weightedProb = probability * (1 - d / maxD) // Linear weighted probability
         // const weightedProb = prob * Math.exp(-a * d / maxD) // Exponential weighted probability
         // const weightedProb = prob * Math.log(1.2 + d) / Math.log(1.1 + maxD); // Logarithmic weighted probability
-        // probability = weightedProb
+        const sinedWeighted = probability * abs(sin(count * 20))
+        // probability = sinedWeighted
 
         if (chance(probability)) {
-            if (shouldContrast && chance(0.000003)) {
-                const r = random(width * 0.2)
+            // Chance of drawing a circle at a spot in the line
+            // TODO: BUGGY, CIRCLES GET DRAWN IN CENTER INSTEAD OF AT X,Y
+            if (shouldContrast && chance(0.000005)) {
+                const rThresh = width * 0.15
+                const maxR = width * 0.35
+                const r = random(maxR)
+                let prob = 0.35
+
+                if (r > rThresh) {
+                    prob = map( r, rThresh, maxR, 0.3, 0.05 )
+                }
+
                 drawCircle(x, y, r, {
-                    divisions: 600,
+                    divisions: 1000,
                     color: palette.contrast,
                     filled: chance(0.5),
                     stroked: true,
-                    strokeWeight: r * 0.5,
+                    strokeWeight: r * random(0.05, 0.5),
                     alphaRnd: [0.01, 0.5],
-                    weightRnd: 4,
-                    probability: 0.5
+                    weightRnd: grainWeight * 0.33,
+                    probability: prob,
+                    noiseX: noiseX * 3,
+                    noiseY: noiseY * 3,
+                    yOffset: 50
                 })
             }
             // if (debug) {
             //     console.log('debug ::: ', x, y)
             // }
 
-            const noiseVal = noise(x * 0.003, y * 0.0045)
-            const d = abs(dist(x, y, 0, 0))
-            const maxD = abs(dist(-width * 0.5, -height * 0.5, 0, 0))
+            const noiseVal =  noise(x * noiseX, y * noiseY)
+            const phaseYOffset = true ? (height * 0.5 - abs(y)) : y // Change true or fale for inverted y
 
-            const sampledClrIdx = floor(map(d, 0, maxD, 0, palette.colors.length - 1))
+            const phase = map(y + height * 0.5, 0, height, 0, 360)
+                // + map(noiseVal * phaseYOffset, 0, height * 0.5, 0, 360)
 
-            const yOff = sin(count * 0.0025 + noiseVal * PI)  * 100
+            // const yOff = useNoise ? sin(count * 0.0025 + noiseVal * PI) * yOffset : 0 // With sine
+            // const yOff = useNoise ? sin(count * 0.0025 + noiseVal * (height * 0.5 - abs(y)) * radians(phase)) * yOffset : 0 // With sine
+            const yOff = useNoise ? sin(count * 0.0025 + radians(phase)) * yOffset : 0 // With sine
+            // const yOff = useNoise ? map(noiseVal, 0, 1, -1, 1) * yOffset : 0 // Without sine
+
 
             push();
             noStroke()
@@ -186,6 +218,37 @@ function drawLine(props) {
                 drawFn(x, y);
             }
         }
+    }
+}
+
+/**
+ * To draw a stroked line, calculate the angle between starting and ending point.
+ * The stroke should be square to this angle
+ */
+function drawLineStroked({ weight, ...props }) {
+    const { x1, x2, y1, y2 } = props;
+
+    // Calculate the slope of the original line
+    const slope = (y2 - y1) / (x2 - x1);
+
+    // Calculate the perpendicular slope
+    const perpendicularSlope = slope === Infinity ? 0 : -1 / slope;
+
+    // Loop over every parallel line from -weight/2 to weight/2
+    for (let d = -floor(weight * 0.5); d <= floor(weight * 0.5); d++) {
+        // Calculate unit vector components
+        let unitX = d / Math.sqrt(1 + perpendicularSlope ** 2);
+        let unitY = perpendicularSlope * unitX;
+
+        // Calculate the starting point (x3, y3)
+        let x3 = x1 + unitX;
+        let y3 = y1 + unitY;
+
+        // Calculate the ending point (x4, y4)
+        let x4 = x2 + unitX;
+        let y4 = y2 + unitY;
+
+        drawLine({ ...props, x1: x3, y1: y3, x2: x4, y2: y4 });
     }
 }
 

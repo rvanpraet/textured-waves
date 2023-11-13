@@ -10,7 +10,10 @@ const palette1 = {
 }
 const palette2 = {
     bg: '#000', // Black
-    contrast: '#B02E0C', // Chinese Red
+    // contrast: '#D33F49', // Rusty Red
+    // contrast: '#EE6352', // Bittersweet
+    // contrast: '#A846A0', // Purpureus
+    contrast: '#81E5EF', // Purpureus
     colors: [
         '#000022', // Oxford blue
         '#8DA1B9', // Cadet grey
@@ -24,7 +27,8 @@ const palette3 = {
     colors: [
         '#394F49', // Dark slate grey
         '#65743A', // Dark olive green
-        '#7CEA9C', // Light green
+        '#650D1B', // Chocolate red
+        // '#7CEA9C', // Light green
         '#EFDD8D', // Flax,
         // '#FC7A1E'
     ]
@@ -32,7 +36,9 @@ const palette3 = {
 
 const palette4 = {
     bg: '#000', // Black
-    contrast: '#FC7A1E', // PUMPKIN
+    // contrast: '#68A691', // Blueish
+    // contrast: '#EAFDF8', // Azure white
+    contrast: '#83B692', // Cambridge greenblue
     colors: [
         '#6C3428',
         '#BA704F',
@@ -43,7 +49,8 @@ const palette4 = {
 
 const palette5 = {
     bg: '#000', // Black
-    contrast: '#FF6666',
+    contrast: '#FF6666', // Bittersweet
+    // contrast: '#58A4B0', // Moonstone (blue)
     colors: [
         '#001524',
         '#445D48',
