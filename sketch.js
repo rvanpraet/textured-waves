@@ -12,18 +12,18 @@ let gradientProb
 const TOTAL_FRAMES = 10
 
 function setup() {
-    palette = palette1 // Pick palette
+    palette = palette2 // Pick palette
     // frameRate(24)
     // Setup canvas // 3840 x 2160 for hi-res
-    createCanvas(720, 720, WEBGL);
+    // createCanvas(720, 720, WEBGL);
     // createCanvas(3000, 4000, WEBGL);
-    // createCanvas(2560, 2560, WEBGL);
+    createCanvas(2560, 2560, WEBGL);
 
     blendMode(ADD)
     background(palette.bg)
 
     step = floor(height * 0.25) // Step influences how thick the rows are, as well as the gap between the rows
-    grainWeight = width * 0.0025
+    grainWeight = width * 0.003
 
     drawWaves()
 
@@ -31,7 +31,7 @@ function setup() {
 
     // drawSquare()
 
-    // save('dunes.tiff')
+    save('dunes.tiff')
 
     noLoop()
 }
@@ -55,7 +55,7 @@ function drawWaves () {
     nextColor = sampleArray(palette.colors)
 
     let stepCounter = abs(step)
-    let probability = 1
+    let probability = 0.8
     
 
     for (let y = -height * 0.6; y <= height * 0.6; y++) {
@@ -67,14 +67,14 @@ function drawWaves () {
         let EDGE_OFFSET = random() * width * 0.275
 
         drawLine({
-            x1: floor(-width * 0.415),
+            x1: floor(-width * 0.5),
             // y1: y + sin(rowPos) * width * 0.03,
             y1: y,
-            x2: floor(width * 0.415),
+            x2: floor(width * 0.5),
             y2: y,
             // y2: y + cos(rowPos) * width * 0.03,
             color: currentColor,
-            alphaRnd: [0.4, 0.95],
+            alphaRnd: [0.3, 0.9],
             weightRnd: noise(y * 0.0035) * grainWeight,
             probability: probability,
             shouldContrast: false,
@@ -87,7 +87,7 @@ function drawWaves () {
 
         // Calculate if y is near the edge of a previous row, and generate probability for color interchanges
         stepCounter--
-        gradientProb = map( stepCounter, step, 0, -0.75, 0.75)
+        gradientProb = map( stepCounter, step, 0, -0.35, 0.35)
 
         if (stepCounter === 0) {
             // Shift colors

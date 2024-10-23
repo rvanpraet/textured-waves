@@ -111,7 +111,8 @@ function drawLine(props) {
         xOffset = 0,
         yOffset = 100
     } = props;
-    let count = 0
+
+    let rowStepCount = 0
 
     x1 = floor(x1);
     y1 = floor(y1);
@@ -125,7 +126,7 @@ function drawLine(props) {
         const weightedProb = probability * (1 - d / maxD) // Linear weighted probability
         // const weightedProb = prob * Math.exp(-a * d / maxD) // Exponential weighted probability
         // const weightedProb = prob * Math.log(1.2 + d) / Math.log(1.1 + maxD); // Logarithmic weighted probability
-        const sinedWeighted = probability * abs(sin(count * 20))
+        const sinedWeighted = probability * abs(sin(rowStepCount * 20))
         // probability = sinedWeighted
 
         if (chance(probability)) {
@@ -167,7 +168,7 @@ function drawLine(props) {
 
             // const yOff = useNoise ? sin(count * 0.0025 + noiseVal * PI) * yOffset : 0 // With sine
             // const yOff = useNoise ? sin(count * 0.0025 + noiseVal * (height * 0.5 - abs(y)) * radians(phase)) * yOffset : 0 // With sine
-            const yOff = useNoise ? sin(count * 0.0025 + radians(phase)) * yOffset : 0 // With sine
+            const yOff = useNoise ? sin(rowStepCount * 0.0025 + radians(phase)) * yOffset : 0 // With sine
             // const yOff = useNoise ? map(noiseVal, 0, 1, -1, 1) * yOffset : 0 // Without sine
 
             let fillColor = currentColor
@@ -187,7 +188,7 @@ function drawLine(props) {
             pop();
         }
 
-        count++
+        rowStepCount++
     };
 
     // Line is not vertical

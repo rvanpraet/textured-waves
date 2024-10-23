@@ -8,8 +8,28 @@ const palette1 = {
         '#232C33', // Gunmetal black
     ]
 }
+const palette1bis = {
+    bg: '#fff',
+    contrast: '#A5E6BA',
+    colors: [
+        '#7C8483', // Battleship grey
+        '#F06543', // Orange soda
+        '#FFC862', // Maximum Yellowred
+        '#232C33', // Gunmetal black
+    ]
+}
+const palette1bis2 = {
+    bg: '#fff',
+    contrast: '#A5E6BA',
+    colors: [
+        '#160C28', 
+        '#000411',
+        '#7A7265',
+        '#F2BB05',
+    ]
+}
 const palette2 = {
-    bg: '#000', // Black
+    bg: '#efefef', // Black
     // contrast: '#D33F49', // Rusty Red
     // contrast: '#EE6352', // Bittersweet
     // contrast: '#A846A0', // Purpureus
