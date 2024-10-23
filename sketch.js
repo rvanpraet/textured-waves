@@ -12,18 +12,18 @@ let gradientProb
 const TOTAL_FRAMES = 10
 
 function setup() {
-    palette = palette3 // Pick palette
+    palette = palette1 // Pick palette
     // frameRate(24)
     // Setup canvas // 3840 x 2160 for hi-res
-    // createCanvas(720, 1280, WEBGL);
+    createCanvas(720, 720, WEBGL);
     // createCanvas(3000, 4000, WEBGL);
-    createCanvas(2560, 2560, WEBGL);
+    // createCanvas(2560, 2560, WEBGL);
 
     blendMode(ADD)
     background(palette.bg)
 
-    step = floor(width * 0.3) // Step influences how thick the rows are, as well as the gap between the rows
-    grainWeight = width * 0.002
+    step = floor(height * 0.25) // Step influences how thick the rows are, as well as the gap between the rows
+    grainWeight = width * 0.0025
 
     drawWaves()
 
@@ -55,7 +55,8 @@ function drawWaves () {
     nextColor = sampleArray(palette.colors)
 
     let stepCounter = abs(step)
-    let probability = 0.6
+    let probability = 1
+    
 
     for (let y = -height * 0.6; y <= height * 0.6; y++) {
 
@@ -63,18 +64,23 @@ function drawWaves () {
             probability = map (abs(y), height * 0.6, height * 0.4, 0, 0.6)
         }
 
+        let EDGE_OFFSET = random() * width * 0.275
+
         drawLine({
-            x1: floor(-width * 0.415) - random() * width * 0.075 ,
-            y1: y + sin(rowPos) * width * 0.03,
-            x2: floor(width * 0.415) + random() * width * 0.075,
-            y2: y + cos(rowPos) * width * 0.03,
+            x1: floor(-width * 0.415),
+            // y1: y + sin(rowPos) * width * 0.03,
+            y1: y,
+            x2: floor(width * 0.415),
+            y2: y,
+            // y2: y + cos(rowPos) * width * 0.03,
             color: currentColor,
-            alphaRnd: [0.1, 0.275],
+            alphaRnd: [0.4, 0.95],
             weightRnd: noise(y * 0.0035) * grainWeight,
             probability: probability,
             shouldContrast: false,
-            // yOffset: map ( noise(step * 0.015, y * 0.006), 0, 1, 80, 120 ),
-            yOffset: map( random(), 0, 1, 40, 120 ),
+            useNoise: true,
+            yOffset: map ( noise(step * 0.015, y * 0.006), 0, 1, 60, 100 ),
+            // yOffset: map( random(), 0, 1, 40, 120 ),
             // noiseX: 0.003 + random(0.001, 0.004),
             // noiseY: 0.0045 + random(0.001, 0.003)
         })

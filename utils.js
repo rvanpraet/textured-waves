@@ -177,7 +177,12 @@ function drawLine(props) {
 
             push();
             noStroke()
-            fill(colorAlpha(chance(gradientProb) ? nextColor : color, random(alphaRnd)));
+            fill(
+                colorAlpha(
+                    chance(gradientProb) ? nextColor : color, 
+                    random(alphaRnd)
+                )
+            );
             circle(x, y + yOff, random(1, weightRnd))
             pop();
         }
