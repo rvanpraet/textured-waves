@@ -52,5 +52,17 @@ const palette5 = {
     ]
 }
 
+const palette6 = {
+    // bg: "#F5F1ED",
+    bg: "#273C2C",
+    contrast: "#B3001B",
+    colors: [
+        "#161753",
+        "#4D84B2",
+        "#5D73BF",
+        "#73C7DA"
+    ]
+}
+
 
 const palettes = [palette1, palette2, palette3]

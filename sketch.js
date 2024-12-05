@@ -6,11 +6,11 @@ let step
 const TOTAL_FRAMES = 10
 
 function setup() {
-    palette = palette5 // Pick palette
+    palette = palette6 // Pick palette
     // frameRate(24)
     // Setup canvas // 3840 x 2160 for hi-res
     // createCanvas(720, 1280, WEBGL);
-    createCanvas(2560, 2560, WEBGL);
+    createCanvas(3000, 3000, WEBGL);
 
     blendMode(ADD)
     step = floor(width * 0.04) // Step influences how thick the rows are, as well as the gap between the rows
