@@ -79,5 +79,21 @@ const palette5 = {
     ]
 }
 
+const palette6 = {
+    // bg: "#0B3C49",
+    bg: "#661E4A", // Main purple
+    contrast: "",
+    colors: [
+        "#7180AC", // Glaucious
+        "#A8D0DB", // Light blue
+        // "#661E4A", // Main Purple
+        "#0B3C49", // Deep Teal
+        // "#FBCAEF", // Pink Lavender
+        "#E85D75", // Bright pink
+        // "#ECA72C", // Yellow
+        // "#D6E681", // Mindaro (greenish)
+    ]
+}
+
 
 const palettes = [palette1, palette2, palette3]

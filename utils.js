@@ -180,7 +180,9 @@ function drawLine(props) {
             noStroke()
             fill(
                 colorAlpha(
-                    chance(gradientProb) ? nextColor : color, 
+                    chance(abs(gradientProb)) // Checks if gradient color
+                        ? gradientProb < 0 ? prevColor : nextColor // Checks if it should use the previous or next color
+                        : color, // Else use the currenct color
                     random(alphaRnd)
                 )
             );
