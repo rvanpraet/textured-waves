@@ -57,6 +57,14 @@ const palette4 = {
   contrast: "#83B692", // Cambridge greenblue
   colors: ["#6C3428", "#BA704F", "#DFA878", "#CEE6F3"],
 };
+const palette4bis = {
+  // bg: '#000', // Black
+  bg: "#CEE6F3", // Off-white
+  // contrast: '#68A691', // Blueish
+  // contrast: '#EAFDF8', // Azure white
+  contrast: "#83B692", // Cambridge greenblue
+  colors: ["#6C3428", "#BA704F", "#DFA878", "#02111B"],
+};
 
 const palette5 = {
   bg: "#000", // Black

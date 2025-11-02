@@ -123,6 +123,8 @@ function drawLine(props) {
   x2 = floor(x2);
   y2 = floor(y2);
 
+  const probPower = random(0.5, 2);
+
   const drawFn = (x, y) => {
     // Calculate noise values and generative offsets
     const rowPosNoiseMult = map(rowPos, 0, 30, 1, 0);
@@ -138,7 +140,7 @@ function drawLine(props) {
     const invertedProbYMap = 1 - abs(probYMap);
 
     // Final probability calculation
-    const probabilityFinal = pow(invertedProbXMap, random(0.5, 2)) + 0.00001;
+    const probabilityFinal = probability * pow(invertedProbXMap, probPower) + 0.00001;
 
     // Draw point based on final probability
     if (chance(probabilityFinal)) {

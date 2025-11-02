@@ -19,7 +19,7 @@ let startY;
 let endY;
 let startX;
 let endX;
-let noiseOffsetStrength = 1.8;
+let noiseOffsetStrength = 1.2;
 
 const TOTAL_FRAMES = 10;
 
@@ -30,7 +30,7 @@ function preload() {
 
 function setup() {
   noiseSeed(3484);
-  palette = palette1bis; // Pick palette
+  palette = palette4bis; // Pick palette
 
   // frameRate(24)
   // Setup canvas // 3840 x 2160 for hi-res
@@ -79,7 +79,7 @@ function draw() {
     color: currentColor,
     alphaRnd: [0.2, 0.7],
     weightRnd: grainWeight,
-    probability: 0.75,
+    probability: 0.95,
     shouldContrast: false,
     useNoise: true,
     noiseX: 0.016,
