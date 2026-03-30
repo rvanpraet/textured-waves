@@ -67,7 +67,7 @@ const palette4bis = {
 };
 
 const palette5 = {
-  bg: "#000", // Black
+  bg: "#0d0d0d", // Black
   contrast: "#FF6666", // Bittersweet
   // contrast: '#58A4B0', // Moonstone (blue)
   colors: ["#001524", "#445D48", "#D6CC99", "#FDE5D4"],
@@ -90,3 +90,16 @@ const palette6 = {
 };
 
 const palettes = [palette1, palette2, palette3];
+
+// Named lookup for UI dropdown
+const PALETTES = {
+  palette1,
+  palette1bis,
+  palette1bis2,
+  palette2,
+  palette3,
+  palette4,
+  palette4bis,
+  palette5,
+  palette6,
+};
