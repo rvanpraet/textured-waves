@@ -1,144 +1,138 @@
-// Constants
-const GRAIN_BASE_SCALE = 0.002;
-const GRAIN_SWAY_SCALE = 0.0005;
-
-// Render state
-let textures = {};
-let particleTexture;
 let palette;
+let layerColors = [];
+let thresholds = [];
 let isRendering = false;
-let renderFrame = 0;
-let rowPos = 0;
-let y, startX, startY, endX, endY;
-let step, gap, stepAmount, gapAmount, stepCounter;
-let grainWeight, increment;
-let prevColor, currentColor, nextColor;
-let gradientProb;
-
-function preload() {
-  textures = {
-    particle1: loadImage('/assets/particle1.png'),
-    particle2: loadImage('/assets/particle2.png'),
-    particle3: loadImage('/assets/particle3.png'),
-  };
-}
+let currentRow = 0;
 
 function setup() {
   const preset = PRINT_PRESETS[params.printPreset];
-  const canvas = createCanvas(preset.w, preset.h, WEBGL);
-  canvas.parent('canvas-container');
+  pixelDensity(1);
+  const canvas = createCanvas(preset.w, preset.h);
+  canvas.parent("canvas-container");
   buildUI();
+  
+  // Initial background draw
+  palette = PALETTES[params.palette];
+  background(palette.bg);
+  
   regenerate();
+}
+
+let grid = [];
+let gridSize = 20;
+
+function regenerate() {
+  randomSeed(params.seed);
+  noiseSeed(params.seed);
+  noiseDetail(params.noiseOctaves, 0.5);
+
+  palette = PALETTES[params.palette];
+  layerColors = interpolateColors(palette.colors, params.layerCount);
+  thresholds = buildThresholds(params.layerCount, params.thresholdMin, params.thresholdMax);
+
+  const preset = PRINT_PRESETS[params.printPreset];
+  if (width !== preset.w || height !== preset.h) {
+    resizeCanvas(preset.w, preset.h);
+  }
+
+  // Initialize collision grid
+  gridSize = ceil(params.circleSize + params.collisionGap);
+  const cols = ceil(width / gridSize);
+  const rows = ceil(height / gridSize);
+  grid = Array.from({ length: cols * rows }, () => []);
+
+  currentRow = 0;
+  isRendering = true;
+  updateProgress(0);
+  loop();
 }
 
 function draw() {
   if (!isRendering) return;
 
-  // Grain size oscillates slightly per frame
-  grainWeight = width * GRAIN_BASE_SCALE + cos(renderFrame * 2) * width * GRAIN_SWAY_SCALE;
-  increment = grainWeight * 0.5 + sin(renderFrame * 2) * grainWeight * 0.25;
+  const batchEnd = min(currentRow + params.rowsPerFrame, height);
 
-  // Gradient probability based on position within current band
-  gradientProb = map(stepCounter, step, 0, -0.5, 0.5);
+  // Base fill via circle based rendering on every pixel
+  blendMode(window[params.blendMode] ?? BLEND);
+  noStroke();
+  for (let py = currentRow; py < batchEnd; py++) {
+    for (let px = 0; px < width; px++) {
+      if (random() > params.circleProb) continue;
 
-  // Draw one horizontal scan line
-  drawLine({
-    x1: startX,
-    y1: y,
-    x2: endX + map(y, startY, endY, 0, width * params.waveSlant),
-    y2: y,
-    color: currentColor,
-    alphaRnd: [params.alphaMin, params.alphaMax],
-    weightRnd: grainWeight,
-    probability: params.probability,
-    useNoise: true,
-    noiseX: params.noiseX,
-    noiseY: params.noiseY,
-  });
+      const size = random(1, params.circleSize);
 
-  // Advance scan position
-  y += increment;
-  stepCounter -= increment;
+      if (params.useCollision) {
+        const gx = floor(px / gridSize);
+        const gy = floor(py / gridSize);
+        const gCols = ceil(width / gridSize);
+        let collision = false;
 
-  // Band boundary: shift colors and adjust step/gap
-  if (stepCounter <= 1) {
-    prevColor = currentColor;
-    currentColor = nextColor;
-    nextColor = sampleArray(palette.colors);
+        // Check neighbors
+        for (let x = -1; x <= 1; x++) {
+          for (let y = -1; y <= 1; y++) {
+            const idx = gx + x + (gy + y) * gCols;
+            if (grid[idx]) {
+              for (const p of grid[idx]) {
+                const d = dist(px, py, p.x, p.y);
+                if (d < (size + p.size) / 2 + params.collisionGap) {
+                  collision = true;
+                  break;
+                }
+              }
+            }
+            if (collision) break;
+          }
+          if (collision) break;
+        }
 
-    step += random(-ceil(stepAmount) * params.bandIrregularity, ceil(stepAmount) * params.bandIrregularity);
-    gap += random(-ceil(gapAmount) * (params.bandIrregularity * 0.5), ceil(gapAmount) * (params.bandIrregularity * 0.4));
+        if (collision) continue;
 
-    stepCounter = abs(step);
-    y += abs(gap);
-    rowPos++;
+        // Store in grid
+        grid[gx + gy * gCols].push({ x: px, y: py, size: size });
+      }
+
+      const n = noise(px * params.noiseScaleX, py * params.noiseScaleY);
+      const layer = getLayer(n, thresholds);
+
+      // Skip drawing on the background layer
+      if (layer < 1) continue;
+
+      const col = layerColors[layer];
+
+      const grain = 1 + (random() - 0.5) * params.grainAmount;
+
+      fill(
+        constrain(red(col) * grain, 0, 255),
+        constrain(green(col) * grain, 0, 255),
+        constrain(blue(col) * grain, 0, 255),
+        random(params.circleAlphaMin, params.circleAlphaMax),
+      );
+      circle(px, py, size);
+    }
   }
 
-  renderFrame++;
+  currentRow = batchEnd;
+  updateProgress((currentRow / height) * 100);
 
-  // Update progress
-  const progress = map(y, startY, endY, 0, 100);
-  updateProgress(progress);
-
-  // Done
-  if (y > endY) {
+  if (currentRow >= height) {
     isRendering = false;
     noLoop();
     updateProgress(100);
   }
 }
 
-function regenerate() {
-  // Seed for reproducibility
-  randomSeed(params.seed);
-  noiseSeed(params.seed);
-
-  // Palette and texture
-  palette = PALETTES[params.palette];
-  particleTexture = textures[params.particleTexture];
-
-  // Resize canvas if preset changed
+function exportImage() {
+  const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, -5);
   const preset = PRINT_PRESETS[params.printPreset];
-  if (width !== preset.w || height !== preset.h) {
-    resizeCanvas(preset.w, preset.h);
-  }
-
-  // Canvas setup
-  blendMode(ADD);
-  background(palette.bg);
-
-  // Drawing region (WEBGL origin is center)
-  startX = -width * 0.5;
-  endX = 0;
-  startY = height * params.regionStartY;
-  endY = height * params.regionEndY;
-  y = startY;
-
-  // Band dimensions
-  stepAmount = height * params.stepAmount;
-  gapAmount = height * params.gapAmount;
-  step = ceil(stepAmount);
-  gap = ceil(gapAmount);
-  stepCounter = abs(step);
-
-  // Initial colors
-  prevColor = sampleArray(palette.colors);
-  currentColor = sampleArray(palette.colors);
-  nextColor = sampleArray(palette.colors);
-
-  // Reset render state
-  rowPos = 0;
-  renderFrame = 0;
-  isRendering = true;
-
-  updateProgress(0);
-  loop();
+  const filename = `noise_layers_s${params.seed}_${preset.w}x${preset.h}_${timestamp}`;
+  saveCanvas(filename, "png");
 }
 
-function exportImage() {
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-  const preset = PRINT_PRESETS[params.printPreset];
-  const paletteName = params.palette;
-  const filename = `dunes_s${params.seed}_${paletteName}_${preset.w}x${preset.h}_${timestamp}`;
-  saveCanvas(filename, 'png');
+function clearCanvas() {
+  isRendering = false;
+  noLoop();
+  blendMode(BLEND);
+  background(palette.bg);
+  currentRow = 0;
+  updateProgress(0);
 }
